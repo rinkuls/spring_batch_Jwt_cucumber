@@ -14,7 +14,7 @@ import java.util.Date;
 @NoArgsConstructor
 @ToString
 
-public class User {
+public class SpringBatchUserRecords {
     @Id
     private Integer id;
     private String name;

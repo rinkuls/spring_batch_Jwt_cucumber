@@ -2,7 +2,7 @@ package com.spring.batch.service;
 
 import com.spring.batch.model.DAOUser;
 import com.spring.batch.model.UserDTO;
-import com.spring.batch.repo.UserDao;
+import com.spring.batch.repo.DAOUserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,14 +15,14 @@ import java.util.ArrayList;
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
     @Autowired
-    private UserDao userDao;
+    private DAOUserRepo DAOUserRepo;
     @Autowired
     private PasswordEncoder bcryptEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        DAOUser user = userDao.findByUsername(username);
+       DAOUser user = DAOUserRepo.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
@@ -34,6 +34,6 @@ public class JwtUserDetailsService implements UserDetailsService {
         DAOUser newUser = new DAOUser();
         newUser.setUsername(user.getUsername());
         newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
-        return userDao.save(newUser);
+        return DAOUserRepo.save(newUser);
     }
 }

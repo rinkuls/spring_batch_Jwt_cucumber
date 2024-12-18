@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.batch.Application;
 import com.spring.batch.config.JwtUserTokenUtil;
 import com.spring.batch.model.JwtRequest;
-import com.spring.batch.model.User;
+import com.spring.batch.model.SpringBatchUserRecords;
 import com.spring.batch.model.UserDTO;
-import com.spring.batch.repo.UserRepository;
+import com.spring.batch.repo.SpringBatchUserRecordsRepo;
 import com.spring.batch.service.JwtUserDetailsService;
 import lombok.var;
 import org.junit.Assert;
@@ -39,7 +39,7 @@ public class LoadControllerITTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private UserRepository userRepository;
+    private SpringBatchUserRecordsRepo springBatchUserRecordsRepo;
 
     @Test
     public void testLoad() throws Exception {
@@ -70,9 +70,9 @@ public class LoadControllerITTest {
                 .andExpect(status().isOk()) // Verify the response status
                 .andReturn(); // Get the result
 
-        List<User> allUsers = userRepository.findAll(); // Fetch all records
-        Assert.assertFalse(allUsers.isEmpty());
-        Assert.assertEquals(5, allUsers.size());
+        List<SpringBatchUserRecords> allSpringBatchUserRecords = springBatchUserRecordsRepo.findAll(); // Fetch all records
+        Assert.assertFalse(allSpringBatchUserRecords.isEmpty());
+        Assert.assertEquals(5, allSpringBatchUserRecords.size());
 
 
     }

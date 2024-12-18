@@ -1,6 +1,6 @@
 package com.spring.batch.config;
 
-import com.spring.batch.model.User;
+import com.spring.batch.model.SpringBatchUserRecords;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -28,13 +28,13 @@ public class SpringBatchConfig {
     @Bean
     public Job job(JobBuilderFactory jobBuilderFactory,
                    StepBuilderFactory stepBuilderFactory,
-                   ItemReader<User> itemReader,
-                   ItemProcessor<User, User> itemProcessor,
-                   ItemWriter<User> itemWriter
+                   ItemReader<SpringBatchUserRecords> itemReader,
+                   ItemProcessor<SpringBatchUserRecords, SpringBatchUserRecords> itemProcessor,
+                   ItemWriter<SpringBatchUserRecords> itemWriter
     ) {
 
         Step step = stepBuilderFactory.get("ETL-file-load")
-                .<User, User>chunk(100)
+                .<SpringBatchUserRecords, SpringBatchUserRecords>chunk(100)
                 .reader(itemReader)
                 .processor(itemProcessor)
                 .writer(itemWriter)
@@ -48,9 +48,9 @@ public class SpringBatchConfig {
     }
 
     @Bean
-    public FlatFileItemReader<User> itemReader() {
+    public FlatFileItemReader<SpringBatchUserRecords> itemReader() {
 
-        FlatFileItemReader<User> flatFileItemReader = new FlatFileItemReader<>();
+        FlatFileItemReader<SpringBatchUserRecords> flatFileItemReader = new FlatFileItemReader<>();
         flatFileItemReader.setResource(new FileSystemResource("src/main/resources/users.csv"));
         flatFileItemReader.setName("CSV-Reader");
         flatFileItemReader.setLinesToSkip(1);
@@ -59,17 +59,17 @@ public class SpringBatchConfig {
     }
 
     @Bean
-    public LineMapper<User> lineMapper() {
+    public LineMapper<SpringBatchUserRecords> lineMapper() {
 
-        DefaultLineMapper<User> defaultLineMapper = new DefaultLineMapper<>();
+        DefaultLineMapper<SpringBatchUserRecords> defaultLineMapper = new DefaultLineMapper<>();
         DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
 
         lineTokenizer.setDelimiter(",");
         lineTokenizer.setStrict(false);
         lineTokenizer.setNames("id", "name", "dept", "salary");
 
-        BeanWrapperFieldSetMapper<User> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
-        fieldSetMapper.setTargetType(User.class);
+        BeanWrapperFieldSetMapper<SpringBatchUserRecords> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
+        fieldSetMapper.setTargetType(SpringBatchUserRecords.class);
 
         defaultLineMapper.setLineTokenizer(lineTokenizer);
         defaultLineMapper.setFieldSetMapper(fieldSetMapper);

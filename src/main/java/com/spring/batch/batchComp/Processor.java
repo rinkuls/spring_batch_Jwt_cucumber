@@ -1,6 +1,6 @@
 package com.spring.batch.batchComp;
 
-import com.spring.batch.model.User;
+import com.spring.batch.model.SpringBatchUserRecords;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Component
 
-public class Processor implements ItemProcessor<User, User> {
+public class Processor implements ItemProcessor<SpringBatchUserRecords, SpringBatchUserRecords> {
     private static final Map<String, String> DEPT_NAMES =
             new HashMap<>();
 
@@ -21,12 +21,12 @@ public class Processor implements ItemProcessor<User, User> {
     }
 
     @Override
-    public User process(User user) throws Exception {
-        String deptCode = user.getDept();
+    public SpringBatchUserRecords process(SpringBatchUserRecords springBatchUserRecords) throws Exception {
+        String deptCode = springBatchUserRecords.getDept();
         String dept = DEPT_NAMES.get(deptCode);
-        user.setDept(dept);
-        user.setTime(new Date());
+        springBatchUserRecords.setDept(dept);
+        springBatchUserRecords.setTime(new Date());
         System.out.println(String.format("Converted from [%s] to [%s]", deptCode, dept));
-        return user;
+        return springBatchUserRecords;
     }
 }
