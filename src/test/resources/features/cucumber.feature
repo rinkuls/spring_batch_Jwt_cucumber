@@ -15,7 +15,7 @@ Feature: get functionality
     Then I should be able to get response as ResponseEntity.ok
     Examples:
       | user_name | pass_word |
-      | abc      | abcd |
+      | abc       | abcd      |
 
 
 
