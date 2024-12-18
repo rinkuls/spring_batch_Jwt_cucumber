@@ -1,12 +1,15 @@
-package com.spring.jwt;
+package com.spring.batch.it;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.batch.Application;
 import com.spring.batch.config.JwtUserTokenUtil;
 import com.spring.batch.model.JwtRequest;
+import com.spring.batch.model.User;
 import com.spring.batch.model.UserDTO;
+import com.spring.batch.repo.UserRepository;
 import com.spring.batch.service.JwtUserDetailsService;
 import lombok.var;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,13 +17,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
-public class JwtAuthenticationControllerTest {
+public class LoadControllerITTest {
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -32,9 +38,11 @@ public class JwtAuthenticationControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
-    public void testSaveUser() throws Exception {
+    public void testLoad() throws Exception {
         UserDTO user = UserDTO.builder().username("test").password("test").build();
         ObjectMapper objectMapper = new ObjectMapper();
         String userJson = objectMapper.writeValueAsString(user);
@@ -43,20 +51,8 @@ public class JwtAuthenticationControllerTest {
                         .content(userJson)) // Add the JSON string as the request body
                 .andExpect(status().isOk()) // Verify the response status
                 .andExpect(jsonPath("$.username").value("test"));
-    }
 
-    @Test
-    public void testCreateAuthenticationToken() throws Exception {
-        UserDTO user = UserDTO.builder().username("test1").password("test1").build();
-        ObjectMapper objectMapper = new ObjectMapper();
-        String userJson = objectMapper.writeValueAsString(user);
-        mockMvc.perform(post("/register")
-                        .contentType("application/json") // Specify the content type as JSON
-                        .content(userJson)) // Add the JSON string as the request body
-                .andExpect(status().isOk()) // Verify the response status
-                .andExpect(jsonPath("$.username").value("test1"));
-
-        JwtRequest req = JwtRequest.builder().username("test1").password("test1").build();
+        JwtRequest req = JwtRequest.builder().username("test").password("test").build();
         ObjectMapper reqMapper = new ObjectMapper();
         String reqJson = reqMapper.writeValueAsString(req);
         var mvcResult = mockMvc.perform(post("/authenticate")
@@ -65,10 +61,19 @@ public class JwtAuthenticationControllerTest {
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();// Verify the response status
 
 
-        // String jwtToken = objectMapper.readTree(mvcResult).get("jwttoken").asText();
+        String jwtToken = objectMapper.readTree(mvcResult).get("jwttoken").asText();
+
+
+        var mvcResult1 = mockMvc.perform(get("/load")
+                        .header("Authorization", "Bearer " + jwtToken) // Pass the token as a Bearer token
+                        .contentType("application/json")) // Specify the content type as JSON
+                .andExpect(status().isOk()) // Verify the response status
+                .andReturn(); // Get the result
+
+        List<User> allUsers = userRepository.findAll(); // Fetch all records
+        Assert.assertFalse(allUsers.isEmpty());
+        Assert.assertEquals(5, allUsers.size());
 
 
     }
-
-
 }
